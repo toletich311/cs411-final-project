@@ -142,3 +142,27 @@ class Book(db.Model):
             logger.error(f"Database error while retrieving book: {e}")
             raise
 
+    @classmethod
+    def get_books_by_shelf(cls, shelf: str) -> List["Book"]:
+        """
+        Retrieve all books by shelf name.
+
+        Args:
+            shelf (str): The shelf category to filter by.
+
+        Returns:
+            List[Book]: List of books on the specified shelf.
+
+        Raises:
+            SQLAlchemyError: If a database error occurs.
+        """
+        logger.info(f"Attempting to retrieve books on shelf '{shelf}'")
+
+        try:
+            books = cls.query.filter_by(shelf=shelf).all()
+            return books
+        except SQLAlchemyError as e:
+            logger.error(f"Database error while retrieving books by shelf: {e}")
+            raise
+
+
