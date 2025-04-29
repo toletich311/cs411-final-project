@@ -191,4 +191,29 @@ class Book(db.Model):
             db.session.rollback()
             raise
 
+    def move_shelf(self, new_shelf: str) -> None:
+        """
+        Move a book to a new shelf.
+
+        Args:
+            new_shelf (str): The new shelf category.
+
+        Raises:
+            ValueError: If the new shelf value is invalid.
+            SQLAlchemyError: If a database error occurs.
+        """
+        logger.info(f"Moving book '{self.title}' from '{self.shelf}' to '{new_shelf}'")
+
+        if new_shelf not in {"want_to_read", "currently_reading", "finished"}:
+            raise ValueError(f"Invalid new shelf '{new_shelf}'.")
+
+        try:
+            self.shelf = new_shelf
+            db.session.commit()
+            logger.info(f"Book '{self.title}' moved to shelf '{new_shelf}'")
+        except SQLAlchemyError as e:
+            logger.error(f"Database error while moving book shelf: {e}")
+            db.session.rollback()
+            raise
+
 

@@ -125,5 +125,19 @@ def test_delete_book_not_found(app):
         with pytest.raises(ValueError, match="not found"):
             Book.delete_book(999)
 
+# --- Move Shelf ---
+
+def test_move_shelf(session, book_harry):
+    """Test moving a book to a different shelf."""
+    book_harry.move_shelf("finished")
+    session.refresh(book_harry)
+    assert book_harry.shelf == "finished"
+
+
+def test_move_shelf_invalid(session, book_harry):
+    """Test moving a book to an invalid shelf raises ValueError."""
+    with pytest.raises(ValueError, match="Invalid new shelf"):
+        book_harry.move_shelf("nonexistent_shelf")
+
 
 
