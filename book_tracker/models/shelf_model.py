@@ -4,7 +4,7 @@ import os
 import time
 from typing import List
 
-from book_tracker.models.book_model import Books
+from book_tracker.models.book_model import Book
 from book_tracker.utils.logger import configure_logger
 from book_tracker.utils.google_books_api import search_books
 
