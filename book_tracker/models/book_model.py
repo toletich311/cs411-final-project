@@ -2,12 +2,14 @@ import logging
 from typing import List
 
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import SQLAlchemyError
 
 from book_tracker.db import db
 from book_tracker.utils.logger import configure_logger
 
 logger = logging.getLogger(__name__)
 configure_logger(logger)
+
 
 class Book(db.Model):
     """Represents a Book tracked by a user.
@@ -43,7 +45,7 @@ class Book(db.Model):
         self.thumbnail = thumbnail
         self.shelf = shelf
 
-    #add methods here
+
     def validate(self) -> None:
         """
         Validates the book instance before committing to the database.
@@ -57,6 +59,8 @@ class Book(db.Model):
             raise ValueError("Authors must be a non-empty string.")
         if self.shelf not in {"want_to_read", "currently_reading", "finished"}:
             raise ValueError(f"Invalid shelf '{self.shelf}'.")
+        
+    @classmethod
     def create_book(cls, title: str, authors: str, description: str = None,
                     isbn: str = None, thumbnail: str = None, shelf: str = "want_to_read") -> None:
         """
