@@ -111,4 +111,19 @@ def test_get_books_by_invalid_shelf(session):
     assert books == []
 
 
+# --- Delete Book ---
+
+def test_delete_book(session, book_harry):
+    """Test successfully deleting a book."""
+    Book.delete_book(book_harry.id)
+    assert session.get(Book, book_harry.id) is None   
+
+
+def test_delete_book_not_found(app):
+    """Test deleting a non-existent book raises ValueError."""
+    with app.app_context():
+        with pytest.raises(ValueError, match="not found"):
+            Book.delete_book(999)
+
+
 

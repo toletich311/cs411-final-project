@@ -164,5 +164,31 @@ class Book(db.Model):
         except SQLAlchemyError as e:
             logger.error(f"Database error while retrieving books by shelf: {e}")
             raise
+    
+
+    @classmethod
+    def delete_book(cls, book_id: int) -> None:
+        """
+        Delete a book by its ID.
+
+        Args:
+            book_id (int): The ID of the book to delete.
+
+        Raises:
+            ValueError: If the book with the given ID is not found.
+            SQLAlchemyError: If a database error occurs.
+        """
+        logger.info(f"Received request to delete book with ID {book_id}")
+
+        try:
+            book = cls.get_book_by_id(book_id)
+            db.session.delete(book)
+            db.session.commit()
+            logger.info(f"Successfully deleted book with ID {book_id}")
+
+        except SQLAlchemyError as e:
+            logger.error(f"Database error while deleting book with ID {book_id}: {e}")
+            db.session.rollback()
+            raise
 
 
