@@ -114,3 +114,31 @@ class Book(db.Model):
             db.session.rollback()
             raise
 
+    @classmethod
+    def get_book_by_id(cls, book_id: int) -> "Book":
+        """
+        Retrieve a book by its ID.
+
+        Args:
+            book_id (int): The ID of the book.
+
+        Returns:
+            Book: The retrieved book instance.
+
+        Raises:
+            ValueError: If no book with the given ID is found.
+            SQLAlchemyError: If a database error occurs.
+        """
+        logger.info(f"Attempting to retrieve book with ID {book_id}")
+
+        try:
+            book = db.session.get(cls, book_id)
+            if not book:
+                logger.warning(f"Book with ID {book_id} not found")
+                raise ValueError(f"Book with ID {book_id} not found")
+            return book
+
+        except SQLAlchemyError as e:
+            logger.error(f"Database error while retrieving book: {e}")
+            raise
+
