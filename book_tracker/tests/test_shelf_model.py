@@ -1,5 +1,3 @@
-# tests/test_shelf_model.py
-
 import unittest
 from unittest.mock import patch
 from book_tracker.models.book_model import Book
@@ -9,8 +7,8 @@ class TestShelf(unittest.TestCase):
 
     def setUp(self):
         self.shelf = Shelf()
-        self.book1 = Book(id=0, title="The Hobbit", authors=["J.R.R. Tolkien"], description="Adventure fantasy")
-        self.book2 = Book(id=0, title="Dune", authors=["Frank Herbert"], description="Sci-fi epic")
+        self.book1 = Book(title="The Hobbit", authors=["J.R.R. Tolkien"], description="Adventure fantasy")
+        self.book2 = Book(title="Dune", authors=["Frank Herbert"], description="Sci-fi epic")
 
     def test_add_and_get_book(self):
         added = self.shelf.add_book(ShelfCategory.WANT_TO_READ, self.book1)
@@ -21,7 +19,7 @@ class TestShelf(unittest.TestCase):
 
     def test_update_book(self):
         self.shelf.add_book(ShelfCategory.FINISHED, self.book1)
-        updated = Book(id=0, title="The Hobbit: Updated", authors=["J.R.R. Tolkien"], description="Updated")
+        updated = Book(title="The Hobbit: Updated", authors=["J.R.R. Tolkien"], description="Updated desc")
         result = self.shelf.update_book(1, updated)
         self.assertEqual(result.title, "The Hobbit: Updated")
 
@@ -59,4 +57,3 @@ class TestShelf(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-
