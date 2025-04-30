@@ -1,5 +1,3 @@
-# book_tracker/models/shelf_model.py
-
 import logging
 import math
 import os
@@ -90,7 +88,6 @@ class Shelf:
         imported_books = []
         for item in results:
             book = Book(
-                id=0,
                 title=item.get("title", "Untitled"),
                 authors=item.get("authors", ["Unknown"]),
                 description=item.get("description", "")
