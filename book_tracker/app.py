@@ -54,20 +54,19 @@ def create_app():
             "message": "Welcome to the Book Tracker API!",
             "routes": {
                 "healthcheck": "/healthcheck [GET]",
-                "create_account": "/create-account [PUT]",
+                "create_user": "/create-user [PUT]",
                 "login": "/login [POST]",
                 "logout": "/logout [POST]",
-                "update_password": "/update-password [POST]",
+                "change_password": "/change-password [POST]",
                 "search_books": "/search?query=... [GET]"
             }
         }), 200
     ##########################################################
-    #
-    # User Managment 
-    #
+    # User Management
     ##########################################################
-    @app.route("/create-account", methods=["PUT"])
-    def create_account():
+
+    @app.route("/create-user", methods=["PUT"])
+    def create_user():
         data = request.get_json()
         username = data.get("username")
         password = data.get("password")
@@ -75,10 +74,12 @@ def create_app():
             return jsonify({"error": "Missing username or password"}), 400
         try:
             Users.create_user(username, password)
-            return jsonify({"message": "Account created successfully"}), 201
+            return jsonify({"status": "success", "message": "Account created successfully"}), 201
         except ValueError as e:
-            return jsonify({"error": str(e)}), 400
+            return jsonify({"status": "error", "error": str(e)}), 400
         
+
+
     @app.route("/login", methods=["POST"])
     def login():
         data = request.get_json()
@@ -88,36 +89,47 @@ def create_app():
             if Users.check_password(username, password):
                 user = Users.query.filter_by(username=username).first()
                 login_user(user)
-                return jsonify({"message": "Login successful"}), 200
+                return jsonify({"status": "success", "message": "Login successful"}), 200
             else:
-                return jsonify({"error": "Invalid credentials"}), 401
+                return jsonify({"status": "error", "error": "Invalid credentials"}), 401
         except ValueError as e:
-            return jsonify({"error": str(e)}), 401
-        
+            return jsonify({"status": "error", "error": str(e)}), 401
+
     @app.route("/logout", methods=["POST"])
     @login_required
     def logout():
         logout_user()
-        return jsonify({"message": "Logged out successfully"}), 200
-    
-    @app.route("/update-password", methods=["POST"])
+        return jsonify({"status": "success", "message": "Logged out successfully"}), 200
+
+    @app.route("/change-password", methods=["POST"])
     @login_required
-    def update_password():
+    def change_password():
         data = request.get_json()
         new_password = data.get("new_password")
         if not new_password:
-            return jsonify({"error": "New password required"}), 400
+            return jsonify({"status": "error", "error": "New password required"}), 400
         try:
             Users.update_password(current_user.username, new_password)
-            return jsonify({"message": "Password updated successfully"}), 200
+            return jsonify({"status": "success", "message": "Password updated successfully"}), 200
         except ValueError as e:
-            return jsonify({"error": str(e)}), 400
+            return jsonify({"status": "error", "error": str(e)}), 400
+        
+  
+
+    @app.route("/reset-users", methods=["DELETE"])
+    def reset_users():
+        try:
+            Users.query.delete()
+            db.session.commit()
+            return jsonify({"status": "success"}), 200
+        except Exception as e:
+            return jsonify({"status": "error", "error": str(e)}), 500
+
+
     
 
     ##########################################################
-    #
     # Books
-    #
     ##########################################################
 
     @app.route("/search", methods=["GET"])
@@ -125,20 +137,44 @@ def create_app():
         query = request.args.get("query")
         if not query:
             return jsonify({"error": "Missing query parameter"}), 400
-
         try:
             books = search_books(query)
             return jsonify({"books": books}), 200
         except Exception as e:
             return jsonify({"error": str(e)}), 500
+
+    @app.route("/reset-books", methods=["DELETE"])
+    def reset_books():
+        try:
+            Book.query.delete()
+            db.session.commit()
+            return jsonify({"status": "success"}), 200
+        except Exception as e:
+            return jsonify({"status": "error", "error": str(e)}), 500
+
+    @app.route("/create-book", methods=["POST"])
+    @login_required
+    def create_book():
+        data = request.get_json()
+        try:
+            book = Book(
+                title=data.get("title"),
+                authors=data.get("authors"),
+                isbn=data.get("isbn"),
+                shelf=data.get("shelf")
+            )
+            db.session.add(book)
+            db.session.commit()
+            return jsonify({"status": "success", "id": book.id}), 201
+        except Exception as e:
+            return jsonify({"status": "error", "error": str(e)}), 400
+
     return app
 
 if __name__ == "__main__":
     import sys
     from pathlib import Path
-    # Add the parent directory to sys.path to resolve `book_tracker` imports
     sys.path.append(str(Path(__file__).resolve().parent))
-
     app = create_app()
     app.run(debug=True)
 

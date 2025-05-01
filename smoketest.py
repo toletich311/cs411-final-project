@@ -2,7 +2,7 @@ import requests
 
 
 def run_smoketest():
-    base_url = "http://localhost:5003/api"
+    base_url = "http://localhost:5003"
     username = "test"
     password = "test"
 
@@ -20,9 +20,9 @@ def run_smoketest():
         "shelf":"CURRENTLY_READING",
     }
 
-    health_response = requests.get(f"{base_url}/health")
+    health_response = requests.get(f"{base_url}/healthcheck")
     assert health_response.status_code == 200
-    assert health_response.json()["status"] == "success"
+    assert health_response.json()["status"] == "ok"
 
     delete_user_response = requests.delete(f"{base_url}/reset-users")
     assert delete_user_response.status_code == 200
@@ -93,6 +93,7 @@ def run_smoketest():
     assert create_book_logged_out_resp.status_code == 401
     assert create_book_logged_out_resp.json()["status"] == "error"
     print("Book creation failed as expected")
+    print("\nALL SMOKETESTS PASSED")
 
 if __name__ == "__main__":
     run_smoketest()
