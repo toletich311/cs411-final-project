@@ -4,6 +4,7 @@ from book_tracker.utils.google_books_api import search_books
 
 @pytest.fixture
 def mock_google_books_api(mocker):
+    """setting up a fixture to mock the google books api"""
     #patch google books api call
     #returns object replaced with mocker
     mock_response = mocker.Mock()
