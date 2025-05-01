@@ -3,27 +3,31 @@ import requests
 from book_tracker.config import GOOGLE_BOOKS_API_URL, GOOGLE_BOOKS_API_KEY
 
 def search_books(query):
-    """Search for books using the Google Books API."""
     params = {
-        'q': query,
-        'maxResults': 10,
+        "q": query,
+        "key": GOOGLE_BOOKS_API_KEY,
+        "maxResults": 10
     }
-    if GOOGLE_BOOKS_API_KEY:
-        params['key'] = GOOGLE_BOOKS_API_KEY
 
-    response = requests.get(GOOGLE_BOOKS_API_URL, params=params)
-    response.raise_for_status()
+    try:
+        response = requests.get(GOOGLE_BOOKS_API_URL, params=params)
+        response.raise_for_status()
+    except requests.exceptions.Timeout:
+        raise RuntimeError("Google Books API request timed out.")
+    except requests.exceptions.RequestException as e:
+        raise RuntimeError(f"Request to Google Books API failed: {e}")
+
     data = response.json()
-
     books = []
-    for item in data.get('items', []):
-        volume_info = item.get('volumeInfo', {})
+
+    for item in data.get("items", []):
+        volume_info = item.get("volumeInfo", {})
         books.append({
-            'id': item.get('id'),
-            'title': volume_info.get('title', 'No Title'),
-            'authors': volume_info.get('authors', []),
-            'description': volume_info.get('description', 'No Description'),
-            'thumbnail': volume_info.get('imageLinks', {}).get('thumbnail', '')
+            "id": item.get("id"),
+            "title": volume_info.get("title", ""),
+            "authors": ", ".join(volume_info.get("authors", [])),
+            "description": volume_info.get("description", ""),
+            "thumbnail": volume_info.get("imageLinks", {}).get("thumbnail", "")
         })
 
     return books
