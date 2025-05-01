@@ -57,7 +57,7 @@ def run_smoketest():
     create_book_resp = session.post(f"{base_url}/create-book", json=book_mockingbird)
     assert create_book_resp.status_code == 201
     assert create_book_resp.json()["status"] == "success"
-    print("book creation successful")
+    print("First book creation successful")
 
     # Change password
     change_password_resp = session.post(f"{base_url}/change-password", json={
@@ -80,7 +80,7 @@ def run_smoketest():
     create_book_resp = session.post(f"{base_url}/create-book", json=book_gatsby)
     assert create_book_resp.status_code == 201
     assert create_book_resp.json()["status"] == "success"
-    print("book creation successful")
+    print("Second book creation successful")
 
     # Log out
     logout_resp = session.post(f"{base_url}/logout")
