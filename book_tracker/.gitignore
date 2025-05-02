@@ -10,3 +10,4 @@ venv/
 pyvenv.cfg
 
 
+site-packages/
