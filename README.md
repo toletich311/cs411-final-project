@@ -6,8 +6,8 @@ Book Tracker is a RESTful API for managing a collection of books. Users can sear
 
 Features
 -Search for books using the Google Books API
--Add Books to one of your Lists
--Remove books
+-Add Books to one of your shelves
+-Remove books from shelves
 -etc. 
 -Includes smoketests and unit tests
 
